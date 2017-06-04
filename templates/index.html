@@ -1,0 +1,291 @@
+<!--References: https://www.w3schools.com-->
+<!DOCTYPE html>
+<html lang="en" ng-app="PA3">
+<head>
+    <meta charset="UTF-8">
+    <link href="static/css/bootstrap.min.css" rel="stylesheet">
+    <script src="static/js/angular.min.js"></script>
+
+    <script src="static/js/angular-animate.js"></script>
+    <script src="static/js/angular-sanitize.js"></script>
+    <script src="static/js/ui-bootstrap-tpls.js"></script>
+    <script src="static/js/script.js"></script>
+    <title>Web Services PA3</title>
+</head>
+<body ng-controller="PA3Ctrl">
+<div class="container">
+    <div class="row text-center">
+        <h2>{{'{{heading}}'}}</h2>
+    </div>
+    <br/>
+    <div class="row">
+        <ul class="nav nav-tabs list-group">
+            <li class="col-sm-6 text-center"><h4><a class="list-group-item" ng-class="{'active':tab_pane=='api_tab'}"
+                                                    ng-click="tab_pane='api_tab'">Search APIs</a></h4></li>
+            <li class="col-sm-6 text-center"><h4><a class="list-group-item" ng-class="{'active':tab_pane=='mashup_tab'}"
+                                                    ng-click="tab_pane='mashup_tab'">Search Mashups</a></h4></li>
+        </ul>
+    </div>
+    <div class="row">
+        <div ng-switch="tab_pane">
+            <div ng-switch-when="api_tab">
+                <div class="row">
+                    <ng-form class="form-horizontal">
+                        <div class="row">
+                            <label class="control-label col-sm-1">Keywords:</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" ng-model="keywords.$"
+                                       ng-model-options="{updateOn:'change blur'}" placeholder="e.g.Google Maps">
+                            </div>
+                            <div class="col-sm-1">
+                                <input type="button" class="form-control btn btn-primary" value="Search">
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="row">
+                            <label class="control-label col-sm-1">Updated Year:</label>
+                            <div class="col-sm-2">
+                                <input type="number" class="form-control" ng-model="keywords.updated"
+                                       ng-model-options="{updateOn:'change blur'}" placeholder="e.g.2015">
+                            </div>
+                            <label class="control-label col-sm-1">Categories:</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" ng-model="keywords.category"
+                                       ng-model-options="{updateOn:'change blur'}" placeholder="e.g.Science">
+                            </div>
+                            <label class="control-label col-sm-1">Tags:</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" ng-model="keywords.tags"
+                                       ng-model-options="{updateOn:'change blur'}" placeholder="e.g.Database,Science">
+                            </div>
+                            <label class="control-label col-sm-1">Protocols:</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" ng-model="keywords.protocols"
+                                       ng-model-options="{updateOn:'change blur'}" placeholder="e.g.REST,SOAP">
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="row">
+                            <label class="control-label col-sm-1">Ratings:</label>
+                            <div class="col-sm-1">
+                                <select class="form-control" ng-dropdown required ng-model="selectedSign"
+                                        ng-options="x for x in signs" ng-model-options="{updateOn:'change blur'}">
+                                </select>
+                            </div>
+                            <div class="col-sm-1">
+                                <input type="number" step="0.1" class="form-control" ng-model="ratingValue"
+                                       placeholder="4.0" ng-model-options="{updateOn:'change blur'}">
+                            </div>
+                        </div>
+                    </ng-form>
+                </div>
+                <br/>
+                <div class="row">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                        <tr class="text-center">
+                            <th></th>
+                            <th>Title</th>
+                            <th>Summary</th>
+                            <th>Rating</th>
+                            <th>Category</th>
+                            <th>Protocols</th>
+                            <th>Tags</th>
+                            <th>Updated Year</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat-start="row in filterData  = ( printData | filter: keywords | filter: ratingFilter(selectedSign,ratingValue) ) | limitTo: numPerPage: maxSize*(currentPage-1) ">
+                            <td>
+                                <button ng-if="row.moreDetails" ng-click="row.moreDetails = false">-</button>
+                                <button ng-if="!row.moreDetails" ng-click="row.moreDetails = true">+</button>
+                            </td>
+                            <td>{{'{{row.title}}'}}</td>
+                            <td>{{'{{row.summary}}'}}</td>
+                            <td>{{'{{row.rating}}'}}</td>
+                            <td>{{'{{row.category}}'}}</td>
+                            <td>{{'{{row.protocols}}'}}</td>
+                            <td><span ng-show="!isArray(row.tags)">{{'{{row.tags}}'}}</span><span
+                                    ng-show="isArray(row.tags)" data-ng-repeat="tag in row.tags track by $index">{{'{{tag}}'}}{{'{{$last ? "" : ", "}}'}}</span>
+                            </td>
+                            <td>{{'{{row.updated}}'}}</td>
+                        </tr>
+                        <tr ng-if="row.moreDetails" ng-repeat-end="">
+                            <td colspan="8">
+                                <div class="row">
+                                    <div class="col-sm-3"><b>Name:</b>{{'{{row.name}}'}}</div>
+                                    <div class="col-sm-3"><b>Label:</b>{{'{{row.label}}'}}</div>
+                                    <div class="col-sm-6"><b>ID:</b>{{'{{row.id}}'}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3"><b>type:</b>{{'{{row.type}}'}}</div>
+                                    <div class="col-sm-3"><b>downloads:</b>{{'{{row.downloads}}'}}</div>
+                                    <div class="col-sm-6"><b>sampleUrl:</b>{{'{{row.sampleUrl}}'}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3"><b>downloadUrl:</b>{{'{{row.downloadUrl}}'}}</div>
+                                    <div class="col-sm-3"><b>DateModified:</b>{{'{{row.DateModified}}'}}</div>
+                                    <div class="col-sm-3"><b>remoteFeed:</b>{{'{{row.remoteFeed}}'}}</div>
+                                    <div class="col-sm-3"><b>numComments:</b>{{'{{row.numComments}}'}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3"><b>data_formats:</b>{{'{{row.data_formats}}'}}</div>
+                                    <div class="col-sm-3"><b>wsdl:</b>{{'{{row.wsdl}}'}}</div>
+                                    <div class="col-sm-6"><b>serviceEndpoint:</b>{{'{{row.serviceEndpoint}}'}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3"><b>apigroups:</b>{{'{{row.apigroups}}'}}</div>
+                                    <div class="col-sm-3"><b>example:</b>{{'{{row.example}}'}}</div>
+                                    <div class="col-sm-6"><b>commentsUrl:</b>{{'{{row.commentsUrl}}'}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3"><b>authentication:</b>{{'{{row.authentication}}'}}</div>
+                                    <div class="col-sm-3"><b>ssl:</b>{{'{{row.ssl}}'}}</div>
+                                    <div class="col-sm-3"><b>readonly:</b>{{'{{row.readonly}}'}}</div>
+                                    <div class="col-sm-3"><b>VendorApiKits:</b>{{'{{row.VendorApiKits}}'}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3"><b>CommunityApiKits:</b>{{'{{row.CommunityApiKits}}'}}</div>
+                                    <div class="col-sm-3"><b>blog:</b>{{'{{row.blog}}'}}</div>
+                                    <div class="col-sm-3"><b>forum:</b>{{'{{row.forum}}'}}</div>
+                                    <div class="col-sm-3"><b>support:</b>{{'{{row.support}}'}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3"><b>accountReq:</b>{{'{{row.accountReq}}'}}</div>
+                                    <div class="col-sm-3"><b>commercial:</b>{{'{{row.commercial}}'}}</div>
+                                    <div class="col-sm-3"><b>provider:</b>{{'{{row.provider}}'}}</div>
+                                    <div class="col-sm-3"><b>managedBy:</b>{{'{{row.managedBy}}'}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3"><b>nonCommercial:</b>{{'{{row.nonCommercial}}'}}</div>
+                                    <div class="col-sm-3"><b>dataLicensing:</b>{{'{{row.dataLicensing}}'}}</div>
+                                    <div class="col-sm-3"><b>fees:</b>{{'{{row.fees}}'}}</div>
+                                    <div class="col-sm-3"><b>limits:</b>{{'{{row.limits}}'}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3"><b>Author:</b>{{'{{row.author}}'}}</div>
+                                    <div class="col-sm-3"><b>terms:</b>{{'{{row.terms}}'}}</div>
+                                    <div class="col-sm-3"><b>company:</b>{{'{{row.company}}'}}</div>
+                                    <div class="col-sm-3"><b>updated:</b>{{'{{row.updated}}'}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3"><b>clientInstall:</b>{{'{{row.clientInstall}}'}}</div>
+                                    <div class="col-sm-3"><b>useCount:</b>{{'{{row.useCount}}'}}</div>
+                                    <div class="col-sm-3"><b>version:</b>{{'{{row.version}}'}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12"><b>Description:</b>{{'{{row.description}}'}}</div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <ul uib-pagination class="pagination-sm pagination" boundary-links="true" rotate="true"
+                    max-size="maxSize"
+                    total-items="filterData.length" ng-model="currentPage" ng-change="pageChanged()"></ul>
+            </div>
+            <div ng-switch-when="mashup_tab">
+                <div class="row">
+                    <ng-form class="form-horizontal">
+                        <div class="row">
+                            <label class="control-label col-sm-1">Keywords:</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" ng-model="keywords.$"
+                                       ng-model-options="{updateOn:'change blur'}" placeholder="e.g.Google Maps">
+                            </div>
+                            <div class="col-sm-1">
+                                <input type="button" class="form-control btn btn-primary" value="Search">
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="row">
+                            <label class="control-label col-sm-1">Updated Year:</label>
+                            <div class="col-sm-2">
+                                <input type="number" class="form-control" ng-model="keywords.updated"
+                                       ng-model-options="{updateOn:'change blur'}" placeholder="e.g.2015">
+                            </div>
+                            <label class="control-label col-sm-2">APIs Used:</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" ng-model="keywords.APIs"
+                                       ng-model-options="{updateOn:'change blur'}" placeholder="e.g.Science">
+                            </div>
+                            <label class="control-label col-sm-1">Tags:</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" ng-model="keywords.tags"
+                                       ng-model-options="{updateOn:'change blur'}" placeholder="e.g.Database,Science">
+                            </div>
+                        </div>
+                        <br/>
+                    </ng-form>
+                </div>
+                <br/>
+                <div class="row">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                        <tr class="text-center">
+                            <th></th>
+                            <th>Title</th>
+                            <th>Summary</th>
+                            <th>APIs</th>
+                            <th>Tags</th>
+                            <th>Updated Year</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat-start="row in filterMashup  = ( mashupData | filter: keywords ) | limitTo: numPerPage: maxSize*(currentPage-1) ">
+                            <td>
+                                <button ng-if="row.moreDetails" ng-click="row.moreDetails = false">-</button>
+                                <button ng-if="!row.moreDetails" ng-click="row.moreDetails = true">+</button>
+                            </td>
+                            <td>{{'{{row.title}}'}}</td>
+                            <td>{{'{{row.summary}}'}}</td>
+                            <td><span ng-show="!isArray(row.APIs)">{{'{{row.APIs}}'}}</span><span
+                                    ng-show="isArray(row.APIs)" data-ng-repeat="api in row.APIs track by $index">{{'{{api}}'}}{{'{{$last ? "" : ", "}}'}}</span>
+                            </td>
+                            <td><span ng-show="!isArray(row.tags)">{{'{{row.tags}}'}}</span><span
+                                    ng-show="isArray(row.tags)" data-ng-repeat="tag in row.tags track by $index">{{'{{tag}}'}}{{'{{$last ? "" : ", "}}'}}</span>
+                            </td>
+                            <td>{{'{{row.updated}}'}}</td>
+                        </tr>
+                        <tr ng-if="row.moreDetails" ng-repeat-end="">
+                            <td colspan="8">
+                                <div class="row">
+                                    <div class="col-sm-3"><b>rating:</b>{{'{{row.rating}}'}}</div>
+                                    <div class="col-sm-3"><b>name:</b>{{'{{row.name}}'}}</div>
+                                    <div class="col-sm-3"><b>label:</b>{{'{{row.label}}'}}</div>
+                                    <div class="col-sm-3"><b>author:</b>{{'{{row.author}}'}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3"><b>type:</b>{{'{{row.type}}'}}</div>
+                                    <div class="col-sm-3"><b>downloads:</b>{{'{{row.downloads}}'}}</div>
+                                    <div class="col-sm-3"><b>useCount:</b>{{'{{row.useCount}}'}}</div>
+                                    <div class="col-sm-3"><b>dateModified:</b>{{'{{row.dateModified}}'}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3"><b>numComments:</b>{{'{{row.numComments}}'}}</div>
+                                    <div class="col-sm-6"><b>sampleUrl:</b>{{'{{row.sampleUrl}}'}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6"><b>id:</b>{{'{{row.id}}'}}</div>
+                                    <div class="col-sm-6"><b>commentsUrl:</b>{{'{{row.commentsUrl}}'}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12"><b>description:</b>{{'{{row.description}}'}}</div>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <ul uib-pagination class="pagination-sm pagination" boundary-links="true" rotate="true"
+                    max-size="maxSize"
+                    total-items="filterMashup.length" ng-model="currentPage" ng-change="pageChanged()"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="static/js/jquery-3.2.1.min.js"></script>
+<script src="static/js/bootstrap.min.js"></script>
+</body>
+</html>
