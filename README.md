@@ -21,7 +21,6 @@ There are not many prerequisites required to build and run this project, but you
   ```
   Folder Structure is as follows:
   ```
-  |__
 	|__static
 		|__css
 		|__fonts
@@ -29,17 +28,21 @@ There are not many prerequisites required to build and run this project, but you
 	|__templates
 		|__index.html
 	|__app.py
+	|__Txt_to_Json.py
+	|__apiJson.json
+	|__mashupJson.json
   ```
 
 
 Install the MongoDB
 
-Import the two JSON files 
+Create a **test** databse
+
+Import the following two JSON files into that mongodb database using mongoimport commonds
 
 1. **apiJson.json** - API Dataset
 2. **mashupJson.json** - Mashup Dataset
 
-using mongoimport commands
 
 ```
 C:\{MongoDB Folder Path}\bin>import --db (dbname) --collection (collectionname) --file (filename with path) --jsonArray
@@ -48,31 +51,11 @@ Start the MongoDB server:
 ```
 C:\{MongoDB Folder Path}\bin>mongod.exe
 ```
-### Clone The GitHub Repository
-  ```bash
-  $ git clone https://github.com/ck4957/Programmable-Web-Query-System
-  ```
-  Navigate into it using your Terminal (Mac & Linux) or Command Prompt (Windows)
-  ```
-  $ cd Programmable-Web-Query-System
-  ```
-  Folder Structure is as follows:
-  ```
-  |__
-	|__static
-		|__css
-		|__fonts
-		|__js
-	|__templates
-		|__index.html
-	|__app.py
-  ```
-Files: 
-	Txt_to_Json.py // Program to parse the two text files and create two json file.
-
 
 ### Run the application using following command: 
 ```python
   python app.py
 ```
-  This will the start localhost on port 5000. Go to browser and enter url: (http:\\localhost:5000)
+  This will the start localhost on port 5000. 
+  
+  Go to browser and enter url: (http://localhost:5000)
